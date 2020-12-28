@@ -9,12 +9,30 @@
             </ul>
         </nav>
         <div v-if="loading">loading ...</div>
-        <div class="card card-body mb-2" v-for="task in tasks" v-bind:key="task.id" >
-            <h3>{{ task.title }}</h3>
-            <p>{{ task.content }}</p>
-            <button @click="editTask(task)" class="btn btn-warning mb-2">Edit</button>
-            <button @click="deleteTask(task.id)" class="btn btn-danger">Delete</button>
+        <div class="card mb-2"  v-for="task,key in tasks" v-bind:key="task.id">
+            <div class="card-body" >
+                <h4 class="card-title">{{ task.title }} </h4>
+                <p class="card-subtitle mb-2 text-muted">Posted by: {{task.user.name}}</p>
+                <p class="card-text">{{ task.content }}</p>
+                <a href="#" @click="deleteTask(task.id)" class="card-link">Comments</a>
+                <a href="#" @click="deleteTask(task.id)" class="card-link">Assign myself</a>
+                <a href="#" @click="deleteTask(task.id)" class="card-link">Assignees</a>
+                <a href="#" @click="editTask(task)" class="card-link">Edit</a>
+                <a href="#" @click="deleteTask(task.id)" class="card-link">Delete</a>
+            </div>
+            <div class="m-2 row">
+               
+                    <div class="input-group">
+                        <textarea v-model="comment[key]" placeholder="Add a comment" class="form-control mr-1" v-bind:id="'comment'+task.id" v-bind:name="'comment'+task.id" rows="1" ></textarea>
+                        
+                        <div class="input-group-append">
+                            <button @click="createComment(task.id,key)"  class="btn btn-info mt-2" >Save</button>                        
+                        </div>
+                    </div>
+                
+            </div>
         </div>
+        
     </div>
 </template>
 
@@ -30,7 +48,13 @@
         },
         data() {
             return {
-               
+                comments : [],
+                comment : {
+                    id : '',
+                    content : '',
+                    user_id : '',
+                    task_id : ''
+                },
                 task : {
                     id : '',
                     title : '',
@@ -43,40 +67,64 @@
                 url : ''
             }
         },
-        created() {
-            // this.fetchTasks();                                                           
-        },
+        
+        // watch: {
+        //     comment: function () {
+        //         this.task_id = this.task.id
+        //     }
+        // },
 
         methods: {
-            // fetchTasks(page_url) {
-                
-            //     page_url = page_url || 'api/tasks';
-            //     this.loading = true;
-            //     axios.get(page_url)
-            //     .then((response) => {
-            //         this.tasks = response.data.data
-            //         this.makePagination(response.data.meta,response.data.links);
-            //         this.loading = false;
-            //     })
-            //     .catch(function (error){
-            //         console.log(error)
-            //     })
-            // },
+            
+            createComment(task_id,key) {
+               
+                if (this.comment && this.comment.id) {
+                    axios({
+                        method: 'put',
+                        url: '/api/comments',
+                        data: {
+                            task_id : this.comment.id,
+                            content : this.comment.content,
+                            user_id : this.$userId,
+                            task_id : task_id
+                        }
+                    })
+                    .then(res => {
+                        // check if the request is successful
+                        this.$emit("comment-edited", this.comment);
+                        this.comment.id = null;
 
-            // makePagination(meta, links) {
-                // let pagination = {
-                //     current_page: meta.current_page,
-                //     last_page: meta.last_page,
-                //     next_page_url: links.next,
-                //     prev_page_url: links.prev
-                // }
-                // this.pagination = pagination
-                // this.$emit('paginationEvent',pagination);
-            // },
+                    })
 
+                    .catch(error =>{
+                        console.log(error)
+                    });
+                }
+                else {
+                    axios({
+                        method: 'post',
+                        url: '/api/comments',
+                        data: {
+                            task_id : this.comment.id,
+                            content : this.comment[key],
+                            user_id : this.$userId,
+                            task_id : task_id
+                        }
+                    })
+                    .then(res => {
+                        // check if the request is successful
+                        this.$emit("comment-created");
+                        this.comment = {}
+                    })
+                    .catch(function (error){
+                        console.log(error)
+                    });
+                }
+            },
             editTask(task) {
                 this.$emit('event1',task);
             },
+
             fetchPage(url) {
                 this.$emit('fetchPageEvent', url);
             },

@@ -2105,6 +2105,26 @@ __webpack_require__.r(__webpack_exports__);
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2143,6 +2163,13 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
+      comments: [],
+      comment: {
+        id: '',
+        content: '',
+        user_id: '',
+        task_id: ''
+      },
       task: {
         id: '',
         title: '',
@@ -2155,32 +2182,51 @@ __webpack_require__.r(__webpack_exports__);
       url: ''
     };
   },
-  created: function created() {// this.fetchTasks();                                                           
-  },
+  // watch: {
+  //     comment: function () {
+  //         this.task_id = this.task.id
+  //     }
+  // },
   methods: {
-    // fetchTasks(page_url) {
-    //     page_url = page_url || 'api/tasks';
-    //     this.loading = true;
-    //     axios.get(page_url)
-    //     .then((response) => {
-    //         this.tasks = response.data.data
-    //         this.makePagination(response.data.meta,response.data.links);
-    //         this.loading = false;
-    //     })
-    //     .catch(function (error){
-    //         console.log(error)
-    //     })
-    // },
-    // makePagination(meta, links) {
-    // let pagination = {
-    //     current_page: meta.current_page,
-    //     last_page: meta.last_page,
-    //     next_page_url: links.next,
-    //     prev_page_url: links.prev
-    // }
-    // this.pagination = pagination
-    // this.$emit('paginationEvent',pagination);
-    // },
+    createComment: function createComment(task_id, key) {
+      var _this = this;
+
+      if (this.comment && this.comment.id) {
+        axios({
+          method: 'put',
+          url: '/api/comments',
+          data: _defineProperty({
+            task_id: this.comment.id,
+            content: this.comment.content,
+            user_id: this.$userId
+          }, "task_id", task_id)
+        }).then(function (res) {
+          // check if the request is successful
+          _this.$emit("comment-edited", _this.comment);
+
+          _this.comment.id = null;
+        })["catch"](function (error) {
+          console.log(error);
+        });
+      } else {
+        axios({
+          method: 'post',
+          url: '/api/comments',
+          data: _defineProperty({
+            task_id: this.comment.id,
+            content: this.comment[key],
+            user_id: this.$userId
+          }, "task_id", task_id)
+        }).then(function (res) {
+          // check if the request is successful
+          _this.$emit("comment-created");
+
+          _this.comment = {};
+        })["catch"](function (error) {
+          console.log(error);
+        });
+      }
+    },
     editTask: function editTask(task) {
       this.$emit('event1', task);
     },
@@ -38053,37 +38099,137 @@ var render = function() {
       _vm._v(" "),
       _vm.loading ? _c("div", [_vm._v("loading ...")]) : _vm._e(),
       _vm._v(" "),
-      _vm._l(_vm.tasks, function(task) {
-        return _c("div", { key: task.id, staticClass: "card card-body mb-2" }, [
-          _c("h3", [_vm._v(_vm._s(task.title))]),
-          _vm._v(" "),
-          _c("p", [_vm._v(_vm._s(task.content))]),
-          _vm._v(" "),
-          _c(
-            "button",
-            {
-              staticClass: "btn btn-warning mb-2",
-              on: {
-                click: function($event) {
-                  return _vm.editTask(task)
+      _vm._l(_vm.tasks, function(task, key) {
+        return _c("div", { key: task.id, staticClass: "card mb-2" }, [
+          _c("div", { staticClass: "card-body" }, [
+            _c("h4", { staticClass: "card-title" }, [
+              _vm._v(_vm._s(task.title) + " ")
+            ]),
+            _vm._v(" "),
+            _c("p", { staticClass: "card-subtitle mb-2 text-muted" }, [
+              _vm._v("Posted by: " + _vm._s(task.user.name))
+            ]),
+            _vm._v(" "),
+            _c("p", { staticClass: "card-text" }, [
+              _vm._v(_vm._s(task.content))
+            ]),
+            _vm._v(" "),
+            _c(
+              "a",
+              {
+                staticClass: "card-link",
+                attrs: { href: "#" },
+                on: {
+                  click: function($event) {
+                    return _vm.deleteTask(task.id)
+                  }
                 }
-              }
-            },
-            [_vm._v("Edit")]
-          ),
-          _vm._v(" "),
-          _c(
-            "button",
-            {
-              staticClass: "btn btn-danger",
-              on: {
-                click: function($event) {
-                  return _vm.deleteTask(task.id)
+              },
+              [_vm._v("Comments")]
+            ),
+            _vm._v(" "),
+            _c(
+              "a",
+              {
+                staticClass: "card-link",
+                attrs: { href: "#" },
+                on: {
+                  click: function($event) {
+                    return _vm.deleteTask(task.id)
+                  }
                 }
-              }
-            },
-            [_vm._v("Delete")]
-          )
+              },
+              [_vm._v("Assign myself")]
+            ),
+            _vm._v(" "),
+            _c(
+              "a",
+              {
+                staticClass: "card-link",
+                attrs: { href: "#" },
+                on: {
+                  click: function($event) {
+                    return _vm.deleteTask(task.id)
+                  }
+                }
+              },
+              [_vm._v("Assignees")]
+            ),
+            _vm._v(" "),
+            _c(
+              "a",
+              {
+                staticClass: "card-link",
+                attrs: { href: "#" },
+                on: {
+                  click: function($event) {
+                    return _vm.editTask(task)
+                  }
+                }
+              },
+              [_vm._v("Edit")]
+            ),
+            _vm._v(" "),
+            _c(
+              "a",
+              {
+                staticClass: "card-link",
+                attrs: { href: "#" },
+                on: {
+                  click: function($event) {
+                    return _vm.deleteTask(task.id)
+                  }
+                }
+              },
+              [_vm._v("Delete")]
+            )
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "m-2 row" }, [
+            _c("div", { staticClass: "input-group" }, [
+              _c("textarea", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.comment[key],
+                    expression: "comment[key]"
+                  }
+                ],
+                staticClass: "form-control mr-1",
+                attrs: {
+                  placeholder: "Add a comment",
+                  id: "comment" + task.id,
+                  name: "comment" + task.id,
+                  rows: "1"
+                },
+                domProps: { value: _vm.comment[key] },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.$set(_vm.comment, key, $event.target.value)
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c("div", { staticClass: "input-group-append" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-info mt-2",
+                    on: {
+                      click: function($event) {
+                        return _vm.createComment(task.id, key)
+                      }
+                    }
+                  },
+                  [_vm._v("Save")]
+                )
+              ])
+            ])
+          ])
         ])
       })
     ],

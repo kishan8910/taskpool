@@ -18,7 +18,7 @@ class Comment extends JsonResource
             'id' => $this->id,
             'content' => $this->content,
             'user_id' => $this->user_id,
-            'task' => new TaskResource($this->whenLoaded('task'))
+            'task_id' => $this->task_id
         ];
     }
 }
