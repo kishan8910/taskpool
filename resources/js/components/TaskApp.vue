@@ -2,7 +2,7 @@
     <div>
         <createedittask :editingtask="editingtask" v-on:task-edited="editTask" v-on:task-created="createTask"/>
         <tasks :tasks="tasks" :pagination="pagination" :loading="loading" v-on:event1="abc" v-on:paginationEvent="makePagination" v-on:fetchPageEvent="fetchTasks" />
-
+    
     </div>
 </template>
 <script>

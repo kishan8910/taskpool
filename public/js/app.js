@@ -1979,7 +1979,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           data: {
             task_id: this.task.id,
             title: this.task.title,
-            content: this.task.content
+            content: this.task.content,
+            created_by: this.$userId
           }
         }).then(function (res) {
           // check if the request is successful
@@ -1996,7 +1997,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           data: {
             task_id: this.task.id,
             title: this.task.title,
-            content: this.task.content
+            content: this.task.content,
+            created_by: this.$userId
           }
         }).then(function (res) {
           // check if the request is successful
@@ -2153,7 +2155,7 @@ __webpack_require__.r(__webpack_exports__);
       url: ''
     };
   },
-  created: function created() {// this.fetchTasks();
+  created: function created() {// this.fetchTasks();                                                           
   },
   methods: {
     // fetchTasks(page_url) {
@@ -50272,6 +50274,7 @@ module.exports = function(module) {
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
+Vue.prototype.$userId = document.querySelector("meta[name='user-id']").getAttribute('content');
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue

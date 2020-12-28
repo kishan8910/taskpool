@@ -63,7 +63,8 @@
                         data: {
                             task_id : this.task.id,
                             title : this.task.title,
-                            content : this.task.content
+                            content : this.task.content,
+                            created_by : this.$userId
                         }
                     })
                     .then(res => {
@@ -84,7 +85,8 @@
                         data: {
                             task_id : this.task.id,
                             title : this.task.title,
-                            content : this.task.content
+                            content : this.task.content,
+                            created_by : this.$userId
                         }
                     })
                     .then(res => {

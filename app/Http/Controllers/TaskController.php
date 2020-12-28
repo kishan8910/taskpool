@@ -9,6 +9,10 @@ use App\Http\Resources\Task as TaskResource;
 
 class TaskController extends Controller
 {
+
+
+
+
     /**
      * Display a listing of the resource.
      *
@@ -43,13 +47,14 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
+        
         $task = $request->isMethod('put') ? Task::findOrFail($request->task_id) : New Task;
         $task->id = $request->input('task_id');
         $task->title = $request->input('title');
         $task->content = $request->input('content');
         $task->views = $request->input('views');
-        $task->created_by = Auth::id();
-        // $task->created_by = $request->input('created_by');
+        // $task->created_by = Auth::id();
+        $task->created_by = $request->input('created_by');
 
 
         if($task->save()) {
