@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Comment;
 use App\Http\Resources\Comment as CommentResource;
 use Illuminate\Http\Request;
+use App\Events\CommentEvent;
 
 class CommentController extends Controller
 {
@@ -42,6 +43,7 @@ class CommentController extends Controller
         $comment->task_id = $request->input('task_id');
         $comment->user_id = $request->input('user_id');
         if($comment->save()) {
+            event(new CommentEvent('Comments Updated!')); 
             return new CommentResource($comment);
         }
     }
