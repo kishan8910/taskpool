@@ -86,7 +86,7 @@
                 },
                 task_id : '',
                 edit : false,
-                url : ''
+                url : '',
             }
         },
         
@@ -95,6 +95,10 @@
         //         this.task_id = this.task.id
         //     }
         // },
+
+        created() {
+            Vue.use(VueToast);
+        },
 
         methods: {
             showCommentsMethod(task) {
@@ -149,6 +153,14 @@
                         console.log(error)
                     });
                 }
+                Echo.private('comment-channel')
+                    .listen('CommentEvent', (e) => {
+                    let instance = Vue.$toast;
+                    instance.success('Comment has been added to the task <strong>'+e.task.title+'</strong> ', {
+                        position: 'top-right'
+                    });
+                    instance.dismiss();
+                });
             },
             editTask(task) {
                 this.$emit('event1',task);

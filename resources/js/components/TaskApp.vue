@@ -6,6 +6,8 @@
     </div>
 </template>
 <script>
+
+
 export default {
     name : 'TaskApp',
      data() {
@@ -18,6 +20,7 @@ export default {
             }
         },
         created() {
+ 
             this.fetchTasks();
         },
 

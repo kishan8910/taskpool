@@ -6,6 +6,7 @@ use App\Comment;
 use App\Http\Resources\Comment as CommentResource;
 use Illuminate\Http\Request;
 use App\Events\CommentEvent;
+use App\Task;
 
 class CommentController extends Controller
 {
@@ -43,7 +44,7 @@ class CommentController extends Controller
         $comment->task_id = $request->input('task_id');
         $comment->user_id = $request->input('user_id');
         if($comment->save()) {
-            event(new CommentEvent('Comments Updated!')); 
+            event(new CommentEvent('Comments Updated!',Task::findOrFail($comment->task_id))); 
             return new CommentResource($comment);
         }
     }

@@ -12,6 +12,16 @@
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}" defer></script>
 
+
+   
+<script src="https://cdn.jsdelivr.net/npm/vue-toast-notification"></script>
+<link href="https://cdn.jsdelivr.net/npm/vue-toast-notification/dist/theme-sugar.css" rel="stylesheet">
+<!-- Init the plugin -->
+
+
+
+
+
     @if (Route::has('register'))
     @endif
     <!-- Fonts -->
