@@ -86,9 +86,9 @@ class CommentController extends Controller
      * @param  \App\Comment  $comment
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Comment $comment)
+    public function destroy($id)
     {
-        $comment = Comment::findOrFail($comment);
+        $comment = Comment::findOrFail($id);
 
         if($comment->delete()) {
             return new CommentResource($comment);            

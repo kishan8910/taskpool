@@ -2045,7 +2045,16 @@ __webpack_require__.r(__webpack_exports__);
     this.fetchTasks();
   },
   methods: {
+    deleteTask: function deleteTask() {
+      this.fetchTasks();
+    },
+    deleteComment: function deleteComment() {
+      this.fetchTasks();
+    },
     createTask: function createTask() {
+      this.fetchTasks();
+    },
+    createComment: function createComment() {
       this.fetchTasks();
     },
     editTask: function editTask(task) {
@@ -2146,6 +2155,26 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     loading: {
@@ -2163,6 +2192,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   },
   data: function data() {
     return {
+      commentEditFormVisible: null,
+      showComments: null,
       comments: [],
       comment: {
         id: '',
@@ -2188,6 +2219,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   //     }
   // },
   methods: {
+    showCommentsMethod: function showCommentsMethod(task) {
+      this.showComments = task.id;
+    },
+    editComment: function editComment(comment) {
+      this.commentEditFormVisible = comment.id;
+      this.comment = comment;
+    },
     createComment: function createComment(task_id, key) {
       var _this = this;
 
@@ -2195,11 +2233,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         axios({
           method: 'put',
           url: '/api/comments',
-          data: _defineProperty({
-            task_id: this.comment.id,
+          data: {
+            comment_id: this.comment.id,
             content: this.comment.content,
-            user_id: this.$userId
-          }, "task_id", task_id)
+            user_id: this.$userId,
+            task_id: task_id
+          }
         }).then(function (res) {
           // check if the request is successful
           _this.$emit("comment-edited", _this.comment);
@@ -2218,7 +2257,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             user_id: this.$userId
           }, "task_id", task_id)
         }).then(function (res) {
-          // check if the request is successful
+          _this.showComments = task_id;
+
           _this.$emit("comment-created");
 
           _this.comment = {};
@@ -2232,6 +2272,30 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     },
     fetchPage: function fetchPage(url) {
       this.$emit('fetchPageEvent', url);
+    },
+    deleteTask: function deleteTask(id) {
+      var _this2 = this;
+
+      axios({
+        method: 'delete',
+        url: '/api/tasks/' + id
+      }).then(function (res) {
+        _this2.$emit("task-deleted");
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    deleteComment: function deleteComment(id) {
+      var _this3 = this;
+
+      axios({
+        method: 'delete',
+        url: '/api/comments/' + id
+      }).then(function (res) {
+        _this3.$emit("comment-deleted");
+      })["catch"](function (error) {
+        console.log(error);
+      });
     }
   }
 });
@@ -37998,7 +38062,10 @@ var render = function() {
         on: {
           event1: _vm.abc,
           paginationEvent: _vm.makePagination,
-          fetchPageEvent: _vm.fetchTasks
+          fetchPageEvent: _vm.fetchTasks,
+          "comment-created": _vm.createComment,
+          "task-deleted": _vm.deleteTask,
+          "comment-deleted": _vm.deleteComment
         }
       })
     ],
@@ -38118,14 +38185,13 @@ var render = function() {
               "a",
               {
                 staticClass: "card-link",
-                attrs: { href: "#" },
                 on: {
                   click: function($event) {
-                    return _vm.deleteTask(task.id)
+                    return _vm.showCommentsMethod(task)
                   }
                 }
               },
-              [_vm._v("Comments")]
+              [_vm._v("Comments (" + _vm._s(task.comments.length) + ")")]
             ),
             _vm._v(" "),
             _c(
@@ -38184,6 +38250,129 @@ var render = function() {
               [_vm._v("Delete")]
             )
           ]),
+          _vm._v(" "),
+          _vm.showComments === task.id
+            ? _c(
+                "div",
+                { attrs: { id: "prev_comment" } },
+                _vm._l(task.comments, function(comment) {
+                  return _c(
+                    "div",
+                    { key: comment.id, staticClass: "col-sm-12" },
+                    [
+                      _vm.commentEditFormVisible !== comment.id
+                        ? _c(
+                            "div",
+                            {
+                              staticClass:
+                                "panel panel-default border mb-2 p-2 bd-highlight"
+                            },
+                            [
+                              _c("div", { staticClass: "panel-heading" }, [
+                                _c("h6", [_vm._v(_vm._s(comment.content))])
+                              ]),
+                              _vm._v(" "),
+                              _c(
+                                "div",
+                                { staticClass: "panel-body text-muted" },
+                                [
+                                  _c("p", [
+                                    _vm._v(
+                                      "Commented by: " +
+                                        _vm._s(comment.user.name)
+                                    )
+                                  ])
+                                ]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "a",
+                                {
+                                  staticClass: "card-link",
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.editComment(comment)
+                                    }
+                                  }
+                                },
+                                [_vm._v("Edit")]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "a",
+                                {
+                                  staticClass: "card-link",
+                                  attrs: { href: "#" },
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.deleteComment(comment.id)
+                                    }
+                                  }
+                                },
+                                [_vm._v("Delete")]
+                              )
+                            ]
+                          )
+                        : _vm._e(),
+                      _vm._v(" "),
+                      _vm.commentEditFormVisible === comment.id
+                        ? _c("div", { staticClass: "m-2 row" }, [
+                            _c("div", { staticClass: "input-group" }, [
+                              _c("textarea", {
+                                directives: [
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: comment.content,
+                                    expression: "comment.content"
+                                  }
+                                ],
+                                staticClass: "form-control mr-1",
+                                attrs: {
+                                  placeholder: "Add a comment",
+                                  id: "comment" + task.id,
+                                  name: "comment" + task.id,
+                                  rows: "1"
+                                },
+                                domProps: { value: comment.content },
+                                on: {
+                                  input: function($event) {
+                                    if ($event.target.composing) {
+                                      return
+                                    }
+                                    _vm.$set(
+                                      comment,
+                                      "content",
+                                      $event.target.value
+                                    )
+                                  }
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("div", { staticClass: "input-group-append" }, [
+                                _c(
+                                  "button",
+                                  {
+                                    staticClass: "btn btn-info mt-2",
+                                    on: {
+                                      click: function($event) {
+                                        $event.preventDefault()
+                                        return _vm.createComment(task.id, key)
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("Update")]
+                                )
+                              ])
+                            ])
+                          ])
+                        : _vm._e()
+                    ]
+                  )
+                }),
+                0
+              )
+            : _vm._e(),
           _vm._v(" "),
           _c("div", { staticClass: "m-2 row" }, [
             _c("div", { staticClass: "input-group" }, [
@@ -50420,7 +50609,10 @@ module.exports = function(module) {
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
-Vue.prototype.$userId = document.querySelector("meta[name='user-id']").getAttribute('content');
+
+if (document.querySelector("meta[name='user-id']")) {
+  Vue.prototype.$userId = document.querySelector("meta[name='user-id']").getAttribute('content');
+}
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue
@@ -50430,6 +50622,7 @@ Vue.prototype.$userId = document.querySelector("meta[name='user-id']").getAttrib
  */
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
+
 
 Vue.component('task-app', __webpack_require__(/*! ./components/TaskApp.vue */ "./resources/js/components/TaskApp.vue")["default"]);
 Vue.component('tasks', __webpack_require__(/*! ./components/Tasks.vue */ "./resources/js/components/Tasks.vue")["default"]);

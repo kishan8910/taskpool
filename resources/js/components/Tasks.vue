@@ -14,25 +14,45 @@
                 <h4 class="card-title">{{ task.title }} </h4>
                 <p class="card-subtitle mb-2 text-muted">Posted by: {{task.user.name}}</p>
                 <p class="card-text">{{ task.content }}</p>
-                <a href="#" @click="deleteTask(task.id)" class="card-link">Comments</a>
+                <a @click="showCommentsMethod(task)" class="card-link">Comments ({{ task.comments.length }})</a>
                 <a href="#" @click="deleteTask(task.id)" class="card-link">Assign myself</a>
                 <a href="#" @click="deleteTask(task.id)" class="card-link">Assignees</a>
                 <a href="#" @click="editTask(task)" class="card-link">Edit</a>
                 <a href="#" @click="deleteTask(task.id)" class="card-link">Delete</a>
             </div>
-            <div class="m-2 row">
-               
-                    <div class="input-group">
-                        <textarea v-model="comment[key]" placeholder="Add a comment" class="form-control mr-1" v-bind:id="'comment'+task.id" v-bind:name="'comment'+task.id" rows="1" ></textarea>
-                        
-                        <div class="input-group-append">
-                            <button @click="createComment(task.id,key)"  class="btn btn-info mt-2" >Save</button>                        
+            
+            <div class="" v-if="showComments === task.id" id="prev_comment">
+                <div class="col-sm-12" v-for="comment in task.comments" v-bind:key="comment.id">
+                    <div v-if="commentEditFormVisible !== comment.id" class="panel panel-default border mb-2 p-2 bd-highlight">
+                        <div class="panel-heading">
+                            <h6>{{ comment.content }}</h6>
+                        </div>
+                        <div class="panel-body text-muted">
+                            <p>Commented by: {{ comment.user.name }}</p>
+                        </div>
+                        <a  @click="editComment(comment)" class="card-link">Edit</a>
+                        <a href="#" @click="deleteComment(comment.id)" class="card-link">Delete</a>
+                    </div>
+                    <div class="m-2 row" v-if="commentEditFormVisible === comment.id">
+                        <div class="input-group">
+                            <textarea v-model="comment.content" placeholder="Add a comment" class="form-control mr-1" v-bind:id="'comment'+task.id" v-bind:name="'comment'+task.id" rows="1" ></textarea>
+                            <div class="input-group-append">
+                                <button class="btn btn-info mt-2" @click.prevent="createComment(task.id,key)">Update</button>
+                            </div>
                         </div>
                     </div>
-                
+                    
+                </div>
+            </div>
+            <div class="m-2 row">
+                <div class="input-group">
+                    <textarea v-model="comment[key]" placeholder="Add a comment" class="form-control mr-1" v-bind:id="'comment'+task.id" v-bind:name="'comment'+task.id" rows="1" ></textarea>
+                    <div class="input-group-append">
+                        <button @click="createComment(task.id,key)"  class="btn btn-info mt-2" >Save</button>                        
+                    </div>
+                </div>
             </div>
         </div>
-        
     </div>
 </template>
 
@@ -48,6 +68,8 @@
         },
         data() {
             return {
+                commentEditFormVisible: null,
+                showComments : null,
                 comments : [],
                 comment : {
                     id : '',
@@ -75,15 +97,22 @@
         // },
 
         methods: {
-            
+            showCommentsMethod(task) {
+                this.showComments = task.id;
+            },
+            editComment(comment) {
+                this.commentEditFormVisible = comment.id;
+                this.comment = comment;
+            },
+
             createComment(task_id,key) {
-               
+                
                 if (this.comment && this.comment.id) {
                     axios({
                         method: 'put',
                         url: '/api/comments',
                         data: {
-                            task_id : this.comment.id,
+                            comment_id : this.comment.id,
                             content : this.comment.content,
                             user_id : this.$userId,
                             task_id : task_id
@@ -112,7 +141,7 @@
                         }
                     })
                     .then(res => {
-                        // check if the request is successful
+                        this.showComments = task_id;
                         this.$emit("comment-created");
                         this.comment = {}
                     })
@@ -128,6 +157,32 @@
             fetchPage(url) {
                 this.$emit('fetchPageEvent', url);
             },
+
+            deleteTask(id) {
+                axios({
+                        method: 'delete',
+                        url: '/api/tasks/'+id,
+                    })
+                    .then(res => {
+                        this.$emit("task-deleted");
+                    })
+                    .catch(error =>{
+                        console.log(error)
+                });
+            },
+
+            deleteComment(id) {
+                axios({
+                        method: 'delete',
+                        url: '/api/comments/'+id,
+                    })
+                    .then(res => {
+                        this.$emit("comment-deleted");
+                    })
+                    .catch(error =>{
+                        console.log(error)
+                });
+            }
             
         }
     }
