@@ -38,7 +38,7 @@ export default {
                 this.fetchTasks();
             },
             editTask(task) {
-                console.log(task);
+               
                 const index = this.tasks.findIndex(t => t.id === task.id);
                 // this.tasks.findIndex(function(t){
                 //     return t.id === task.id

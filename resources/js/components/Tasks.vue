@@ -85,7 +85,8 @@
                     title : '',
                     content : '',
                     views : '',
-                    user_id : ''
+                    user_id : '',
+                    image : ''
                 },
                 task_id : '',
                 edit : false,

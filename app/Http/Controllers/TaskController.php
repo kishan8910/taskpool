@@ -12,20 +12,6 @@ use Illuminate\Support\Facades\Storage;
 class TaskController extends Controller
 {
 
-    /**
-     * Get a validator for an incoming task request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    protected function validator(array $data)
-    {
-        return Validator::make($data, [
-            'title' => ['required', 'string', 'max:100', 'unique:tasks'],
-            'content' => ['required', 'string']
-        ]);
-    }
-
 
     /**
      * Display a listing of the resource.
@@ -61,7 +47,10 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        
+        $this->validate($request,[
+            'title' => ['required', 'string', 'max:100'],
+            'content' => ['required', 'string']
+        ]);
         $task = $request->isMethod('put') ? Task::findOrFail($request->task_id) : New Task;
         $task->id = $request->input('task_id');
         $task->title = $request->input('title');

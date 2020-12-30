@@ -1914,6 +1914,12 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 //
 //
 //
@@ -1953,6 +1959,35 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+var Errors = /*#__PURE__*/function () {
+  function Errors() {
+    _classCallCheck(this, Errors);
+
+    this.errors = {};
+  }
+
+  _createClass(Errors, [{
+    key: "get",
+    value: function get(field) {
+      if (this.errors[field]) {
+        return this.errors[field][0];
+      }
+    }
+  }, {
+    key: "record",
+    value: function record(errors) {
+      this.errors = errors.errors;
+    }
+  }]);
+
+  return Errors;
+}();
+
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     editingtask: {
@@ -1961,6 +1996,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   },
   data: function data() {
     return {
+      errors: new Errors(),
       loading: false,
       task: {
         id: '',
@@ -1977,8 +2013,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   },
   watch: {
     editingtask: function editingtask(newtask) {
-      this.task = _objectSpread({}, newtask);
-      this.image = newtask.image;
+      this.task = _objectSpread({}, newtask); // this.image = newtask.image;
     }
   },
   methods: {
@@ -2004,7 +2039,28 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     createTask: function createTask() {
       var _this2 = this;
 
+      var self = this;
+
       if (this.task && this.task.id) {
+        axios({
+          method: 'put',
+          url: '/api/tasks',
+          data: {
+            task_id: this.task.id,
+            title: this.task.title,
+            content: this.task.content,
+            created_by: this.$userId
+          }
+        }).then(function (res) {
+          _this2.errors = new Errors();
+
+          _this2.$emit("task-edited", _this2.task);
+
+          _this2.task.id = null;
+        })["catch"](function (error) {
+          _this2.errors.record(error.response.data);
+        });
+      } else {
         var data = new FormData();
         data.append('image', document.getElementById('image').files[0]);
         data.append('task_id', this.task.id);
@@ -2012,47 +2068,21 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         data.append('content', this.task.content);
         data.append('created_by', this.$userId);
         axios({
-          method: 'put',
-          url: '/api/tasks',
-          data: data
-        }).then(function (res) {
-          // check if the request is successful
-          removeImage();
-
-          _this2.$emit("task-edited", _this2.task);
-
-          _this2.task.id = null;
-        })["catch"](function (error) {
-          console.log(error);
-        });
-      } else {
-        var _data = new FormData();
-
-        _data.append('image', document.getElementById('image').files[0]);
-
-        _data.append('task_id', this.task.id);
-
-        _data.append('title', this.task.title);
-
-        _data.append('content', this.task.content);
-
-        _data.append('created_by', this.$userId);
-
-        axios({
           headers: {
             'Content-Type': 'multipart/form-data'
           },
           method: 'post',
           url: '/api/tasks',
-          data: _data
+          data: data
         }).then(function (res) {
-          // check if the request is successful
+          _this2.errors = new Errors();
+
           _this2.$emit("task-created");
 
           _this2.image = '';
           _this2.task = {};
         })["catch"](function (error) {
-          console.log(error);
+          _this2.errors.record(error.response.data);
         });
       }
     }
@@ -2104,7 +2134,6 @@ __webpack_require__.r(__webpack_exports__);
       this.fetchTasks();
     },
     editTask: function editTask(task) {
-      console.log(task);
       var index = this.tasks.findIndex(function (t) {
         return t.id === task.id;
       }); // this.tasks.findIndex(function(t){
@@ -2255,7 +2284,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         title: '',
         content: '',
         views: '',
-        user_id: ''
+        user_id: '',
+        image: ''
       },
       task_id: '',
       edit: false,
@@ -44118,6 +44148,14 @@ var render = function() {
                   }
                 }),
                 _vm._v(" "),
+                _c(
+                  "span",
+                  { staticClass: "text-danger", attrs: { role: "alert" } },
+                  [_c("strong", [_vm._v(_vm._s(_vm.errors.get("title")))])]
+                ),
+                _vm._v(" "),
+                _c("br"),
+                _vm._v(" "),
                 _c("label", { attrs: { for: "content" } }, [_vm._v("Content")]),
                 _vm._v(" "),
                 _c("textarea", {
@@ -44141,6 +44179,14 @@ var render = function() {
                     }
                   }
                 }),
+                _vm._v(" "),
+                _c(
+                  "span",
+                  { staticClass: "text-danger", attrs: { role: "alert" } },
+                  [_c("strong", [_vm._v(_vm._s(_vm.errors.get("content")))])]
+                ),
+                _vm._v(" "),
+                _c("br"),
                 _vm._v(" "),
                 _c(
                   "button",

@@ -10,11 +10,16 @@
                             <div class="form-group">
                                 <label for="title">Title</label>
                                 <input  type="text" class="form-control" name="title" id="title" v-model="task.title" /> 
-                            
-                            
+                                <span class="text-danger" role="alert">
+                                    <strong>{{ errors.get('title') }}</strong>
+                                </span>
+                                <br>
                                 <label for="content">Content</label>
                                 <textarea v-model="task.content" class="form-control" id="content" name="content" rows="4" ></textarea>
-                                  
+                                <span class="text-danger" role="alert">
+                                    <strong>{{ errors.get('content') }}</strong>
+                                </span>
+                                <br>
                                 <button type="submit" class="btn btn-sm btn-primary
                    pull-right" style="margin:10px; padding:5 15 5 15; background-color:#4267b2">Save Task</button>       
                                 
@@ -38,6 +43,23 @@
 </template>
 
 <script>
+    
+    class Errors {
+        constructor() {
+            this.errors = {};
+        }
+
+        get(field) {
+            if( this.errors[field]) {
+                return this.errors[field][0];
+            }
+        }
+
+        record(errors) {
+            this.errors = errors.errors;
+        }
+    }
+
     export default {
 
         props: {
@@ -47,6 +69,7 @@
 
         data() {
             return {
+                errors : new Errors(),
                 loading : false,
                 task : {
                     id : '',
@@ -64,10 +87,10 @@
         watch: {
             editingtask: function (newtask) {
                 this.task = {...newtask};
-                this.image = newtask.image;
+                // this.image = newtask.image;
             }
         },
-        methods: {      
+        methods: {   
             removeImage() {
                 this.image = '';
             },
@@ -84,30 +107,28 @@
                 reader.readAsDataURL(file);
             },
             createTask() {
-                
+                var self = this;
                 if (this.task && this.task.id) {
-                    let data = new FormData;
-                    data.append('image', document.getElementById('image').files[0]);
-                    data.append('task_id', this.task.id);
-                    data.append('title', this.task.title);
-                    data.append('content', this.task.content);
-                    data.append('created_by', this.$userId);
+                    
 
                     axios({
                         method: 'put',
                         url: '/api/tasks',
-                        data: data
+                        data: {
+                            task_id: this.task.id,
+                            title: this.task.title,
+                            content: this.task.content,
+                            created_by: this.$userId
+                        }
                     })
                     .then(res => {
-                        // check if the request is successful
-                        removeImage();
+                        this.errors = new Errors();
                         this.$emit("task-edited", this.task);
                         this.task.id = null;
                         
                     })
-
-                    .catch(error =>{
-                        console.log(error)
+                    .catch(error => {
+                        this.errors.record(error.response.data);
                     });
                 }
                 else {
@@ -126,13 +147,13 @@
                         data: data
                     })
                     .then(res => {
-                        // check if the request is successful
+                        this.errors = new Errors();
                         this.$emit("task-created");
                         this.image = '';
-                        this.task = {}
+                        this.task = {};
                     })
-                    .catch(function (error){
-                        console.log(error)
+                   .catch(error => {
+                        this.errors.record(error.response.data);
                     });
                 }
             }
