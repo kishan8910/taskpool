@@ -17,16 +17,18 @@ class CommentEvent implements ShouldBroadcast
 
     public $message;
     public $task = null;
+    public $comment = null;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($message,$task)
+    public function __construct($message,$task,$comment)
     {
         $this->message = $message;
         $this->task = $task;
+        $this->comment = $comment;
     }
 
     /**

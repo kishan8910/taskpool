@@ -44,7 +44,7 @@ class CommentController extends Controller
         $comment->task_id = $request->input('task_id');
         $comment->user_id = $request->input('user_id');
         if($comment->save()) {
-            event(new CommentEvent('Comments Updated!',Task::findOrFail($comment->task_id))); 
+            event(new CommentEvent('Comments Updated!',Task::findOrFail($comment->task_id),$comment)); 
             return new CommentResource($comment);
         }
     }

@@ -17,11 +17,17 @@
                     <img :src=getImgUrl(task.image) width="200"/><br>
                     {{ task.content }}
                 </p>
-                <a @click="showCommentsMethod(task)" class="card-link">Comments ({{ task.comments.length }})</a>
-                <a href="#" @click="deleteTask(task.id)" class="card-link">Assign myself</a>
-                <a href="#" @click="deleteTask(task.id)" class="card-link">Assignees</a>
-                <a href="#" @click="editTask(task)" class="card-link">Edit</a>
-                <a href="#" @click="deleteTask(task.id)" class="card-link">Delete</a>
+                <a style="cursor: pointer;" @click="showCommentsMethod(task)" class="card-link">Comments ({{ task.comments.length }})</a>
+                <a style="cursor: pointer;" @click="deleteTask(task.id)" class="card-link">Assign me</a>
+                
+                <a style="cursor: pointer;" v-b-modal.modal-1 class="card-link">Assignees ({{ task.assignees.length }})</a>
+                <b-modal id="modal-1" title="BootstrapVue">
+                    <p class="my-4">Hello from modal!</p>
+                </b-modal>
+
+
+                <a v-if="authorizeUser(task.user.id)" style="cursor: pointer;" @click="editTask(task)" class="card-link">Edit</a>
+                <a v-if="authorizeUser(task.user.id)" style="cursor: pointer;" @click="deleteTask(task.id)" class="card-link">Delete</a>
             </div>
             
             <div class="" v-if="showComments === task.id" id="prev_comment">
@@ -33,8 +39,8 @@
                         <div class="panel-body text-muted">
                             <p>Commented by: {{ comment.user.name }}</p>
                         </div>
-                        <a  @click="editComment(comment)" class="card-link">Edit</a>
-                        <a href="#" @click="deleteComment(comment.id)" class="card-link">Delete</a>
+                        <a style="cursor: pointer;" v-if="authorizeUser(comment.user.id)" @click="editComment(comment)" class="card-link">Edit</a>
+                        <a style="cursor: pointer;" v-if="authorizeUser(comment.user.id)" @click="deleteComment(comment.id)" class="card-link">Delete</a>
                     </div>
                     <div class="m-2 row" v-if="commentEditFormVisible === comment.id">
                         <div class="input-group">
@@ -101,6 +107,7 @@
         // },
 
         created() {
+
             Vue.use(VueToast);
             Echo.private('comment-channel')
                     .listen('CommentEvent', (e) => {
@@ -108,12 +115,38 @@
                     instance.success('Comment has been added to the task <strong>'+e.task.title+'</strong> ', {
                         position: 'top-right'
                     });
+
+                    this.$emit("comment-created");
+                    // const index = this.tasks.findIndex(t => t.id === e.task.id);
+                    // // this.tasks.findIndex(function(t){
+                    // //     return t.id === task.id
+                    // // })
+                    // if(index !== -1){
+                    //     this.tasks[index].title = task.title;
+                    //     this.tasks[index].content = task.content;
+                    // }
+
+                    // this.task
                     instance.dismiss();
                 });
 
         },
 
         methods: {
+
+            showAssignees(taskObj) {
+                console.log(taskObj.assignees);
+            },
+
+            authorizeUser(id) {
+                
+                if(id == this.$userId) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            },
 
             getImgUrl(image) {
                 if(image) {

@@ -2253,6 +2253,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     loading: {
@@ -2298,16 +2304,40 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   //     }
   // },
   created: function created() {
+    var _this = this;
+
     Vue.use(VueToast);
     Echo["private"]('comment-channel').listen('CommentEvent', function (e) {
       var instance = Vue.$toast;
       instance.success('Comment has been added to the task <strong>' + e.task.title + '</strong> ', {
         position: 'top-right'
       });
+
+      _this.$emit("comment-created"); // const index = this.tasks.findIndex(t => t.id === e.task.id);
+      // // this.tasks.findIndex(function(t){
+      // //     return t.id === task.id
+      // // })
+      // if(index !== -1){
+      //     this.tasks[index].title = task.title;
+      //     this.tasks[index].content = task.content;
+      // }
+      // this.task
+
+
       instance.dismiss();
     });
   },
   methods: {
+    showAssignees: function showAssignees(taskObj) {
+      console.log(taskObj.assignees);
+    },
+    authorizeUser: function authorizeUser(id) {
+      if (id == this.$userId) {
+        return true;
+      } else {
+        return false;
+      }
+    },
     getImgUrl: function getImgUrl(image) {
       if (image) {
         return 'img/' + image;
@@ -2323,7 +2353,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.comment = comment;
     },
     createComment: function createComment(task_id, key) {
-      var _this = this;
+      var _this2 = this;
 
       if (this.comment && this.comment.id) {
         axios({
@@ -2337,9 +2367,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           }
         }).then(function (res) {
           // check if the request is successful
-          _this.$emit("comment-edited", _this.comment);
+          _this2.$emit("comment-edited", _this2.comment);
 
-          _this.comment.id = null;
+          _this2.comment.id = null;
         })["catch"](function (error) {
           console.log(error);
         });
@@ -2353,11 +2383,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             user_id: this.$userId
           }, "task_id", task_id)
         }).then(function (res) {
-          _this.showComments = task_id;
+          _this2.showComments = task_id;
 
-          _this.$emit("comment-created");
+          _this2.$emit("comment-created");
 
-          _this.comment = {};
+          _this2.comment = {};
         })["catch"](function (error) {
           console.log(error);
         });
@@ -2370,25 +2400,25 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.$emit('fetchPageEvent', url);
     },
     deleteTask: function deleteTask(id) {
-      var _this2 = this;
+      var _this3 = this;
 
       axios({
         method: 'delete',
         url: '/api/tasks/' + id
       }).then(function (res) {
-        _this2.$emit("task-deleted");
+        _this3.$emit("task-deleted");
       })["catch"](function (error) {
         console.log(error);
       });
     },
     deleteComment: function deleteComment(id) {
-      var _this3 = this;
+      var _this4 = this;
 
       axios({
         method: 'delete',
         url: '/api/comments/' + id
       }).then(function (res) {
-        _this3.$emit("comment-deleted");
+        _this4.$emit("comment-deleted");
       })["catch"](function (error) {
         console.log(error);
       });
@@ -44451,94 +44481,116 @@ var render = function() {
       _vm._v(" "),
       _vm._l(_vm.tasks, function(task, key) {
         return _c("div", { key: task.id, staticClass: "card mb-2" }, [
-          _c("div", { staticClass: "card-body" }, [
-            _c("h4", { staticClass: "card-title" }, [
-              _vm._v(_vm._s(task.title) + " ")
-            ]),
-            _vm._v(" "),
-            _c("p", { staticClass: "card-subtitle mb-2 text-muted" }, [
-              _vm._v("Posted by: " + _vm._s(task.user.name))
-            ]),
-            _vm._v(" "),
-            _c("p", { staticClass: "card-text" }, [
-              _c("img", {
-                attrs: { src: _vm.getImgUrl(task.image), width: "200" }
-              }),
-              _c("br"),
-              _vm._v(
-                "\n                " + _vm._s(task.content) + "\n            "
-              )
-            ]),
-            _vm._v(" "),
-            _c(
-              "a",
-              {
-                staticClass: "card-link",
-                on: {
-                  click: function($event) {
-                    return _vm.showCommentsMethod(task)
+          _c(
+            "div",
+            { staticClass: "card-body" },
+            [
+              _c("h4", { staticClass: "card-title" }, [
+                _vm._v(_vm._s(task.title) + " ")
+              ]),
+              _vm._v(" "),
+              _c("p", { staticClass: "card-subtitle mb-2 text-muted" }, [
+                _vm._v("Posted by: " + _vm._s(task.user.name))
+              ]),
+              _vm._v(" "),
+              _c("p", { staticClass: "card-text" }, [
+                _c("img", {
+                  attrs: { src: _vm.getImgUrl(task.image), width: "200" }
+                }),
+                _c("br"),
+                _vm._v(
+                  "\n                " + _vm._s(task.content) + "\n            "
+                )
+              ]),
+              _vm._v(" "),
+              _c(
+                "a",
+                {
+                  staticClass: "card-link",
+                  staticStyle: { cursor: "pointer" },
+                  on: {
+                    click: function($event) {
+                      return _vm.showCommentsMethod(task)
+                    }
                   }
-                }
-              },
-              [_vm._v("Comments (" + _vm._s(task.comments.length) + ")")]
-            ),
-            _vm._v(" "),
-            _c(
-              "a",
-              {
-                staticClass: "card-link",
-                attrs: { href: "#" },
-                on: {
-                  click: function($event) {
-                    return _vm.deleteTask(task.id)
+                },
+                [_vm._v("Comments (" + _vm._s(task.comments.length) + ")")]
+              ),
+              _vm._v(" "),
+              _c(
+                "a",
+                {
+                  staticClass: "card-link",
+                  staticStyle: { cursor: "pointer" },
+                  on: {
+                    click: function($event) {
+                      return _vm.deleteTask(task.id)
+                    }
                   }
-                }
-              },
-              [_vm._v("Assign myself")]
-            ),
-            _vm._v(" "),
-            _c(
-              "a",
-              {
-                staticClass: "card-link",
-                attrs: { href: "#" },
-                on: {
-                  click: function($event) {
-                    return _vm.deleteTask(task.id)
-                  }
-                }
-              },
-              [_vm._v("Assignees")]
-            ),
-            _vm._v(" "),
-            _c(
-              "a",
-              {
-                staticClass: "card-link",
-                attrs: { href: "#" },
-                on: {
-                  click: function($event) {
-                    return _vm.editTask(task)
-                  }
-                }
-              },
-              [_vm._v("Edit")]
-            ),
-            _vm._v(" "),
-            _c(
-              "a",
-              {
-                staticClass: "card-link",
-                attrs: { href: "#" },
-                on: {
-                  click: function($event) {
-                    return _vm.deleteTask(task.id)
-                  }
-                }
-              },
-              [_vm._v("Delete")]
-            )
-          ]),
+                },
+                [_vm._v("Assign me")]
+              ),
+              _vm._v(" "),
+              _c(
+                "a",
+                {
+                  directives: [
+                    {
+                      name: "b-modal",
+                      rawName: "v-b-modal.modal-1",
+                      modifiers: { "modal-1": true }
+                    }
+                  ],
+                  staticClass: "card-link",
+                  staticStyle: { cursor: "pointer" }
+                },
+                [_vm._v("Assignees (" + _vm._s(task.assignees.length) + ")")]
+              ),
+              _vm._v(" "),
+              _c(
+                "b-modal",
+                { attrs: { id: "modal-1", title: "BootstrapVue" } },
+                [
+                  _c("p", { staticClass: "my-4" }, [
+                    _vm._v("Hello from modal!")
+                  ])
+                ]
+              ),
+              _vm._v(" "),
+              _vm.authorizeUser(task.user.id)
+                ? _c(
+                    "a",
+                    {
+                      staticClass: "card-link",
+                      staticStyle: { cursor: "pointer" },
+                      on: {
+                        click: function($event) {
+                          return _vm.editTask(task)
+                        }
+                      }
+                    },
+                    [_vm._v("Edit")]
+                  )
+                : _vm._e(),
+              _vm._v(" "),
+              _vm.authorizeUser(task.user.id)
+                ? _c(
+                    "a",
+                    {
+                      staticClass: "card-link",
+                      staticStyle: { cursor: "pointer" },
+                      on: {
+                        click: function($event) {
+                          return _vm.deleteTask(task.id)
+                        }
+                      }
+                    },
+                    [_vm._v("Delete")]
+                  )
+                : _vm._e()
+            ],
+            1
+          ),
           _vm._v(" "),
           _vm.showComments === task.id
             ? _c(
@@ -44574,32 +44626,37 @@ var render = function() {
                                 ]
                               ),
                               _vm._v(" "),
-                              _c(
-                                "a",
-                                {
-                                  staticClass: "card-link",
-                                  on: {
-                                    click: function($event) {
-                                      return _vm.editComment(comment)
-                                    }
-                                  }
-                                },
-                                [_vm._v("Edit")]
-                              ),
+                              _vm.authorizeUser(comment.user.id)
+                                ? _c(
+                                    "a",
+                                    {
+                                      staticClass: "card-link",
+                                      staticStyle: { cursor: "pointer" },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.editComment(comment)
+                                        }
+                                      }
+                                    },
+                                    [_vm._v("Edit")]
+                                  )
+                                : _vm._e(),
                               _vm._v(" "),
-                              _c(
-                                "a",
-                                {
-                                  staticClass: "card-link",
-                                  attrs: { href: "#" },
-                                  on: {
-                                    click: function($event) {
-                                      return _vm.deleteComment(comment.id)
-                                    }
-                                  }
-                                },
-                                [_vm._v("Delete")]
-                              )
+                              _vm.authorizeUser(comment.user.id)
+                                ? _c(
+                                    "a",
+                                    {
+                                      staticClass: "card-link",
+                                      staticStyle: { cursor: "pointer" },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.deleteComment(comment.id)
+                                        }
+                                      }
+                                    },
+                                    [_vm._v("Delete")]
+                                  )
+                                : _vm._e()
                             ]
                           )
                         : _vm._e(),
