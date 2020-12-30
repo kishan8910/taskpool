@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 // use App\Http\Requests;
 use App\Task;
 use App\Http\Resources\Task as TaskResource;
+use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
 {
@@ -53,10 +54,13 @@ class TaskController extends Controller
         $task->title = $request->input('title');
         $task->content = $request->input('content');
         $task->views = $request->input('views');
-        // $task->created_by = Auth::id();
         $task->created_by = $request->input('created_by');
-
-
+        
+        if($request->hasFile('image')) {
+            Storage::delete($task->image);
+            $task->image = $request->image->store('images');
+        }
+        
         if($task->save()) {
             return new TaskResource($task);
         }
@@ -107,6 +111,7 @@ class TaskController extends Controller
         $task = Task::findOrFail($id);
 
         if($task->delete()) {
+            Storage::delete($task->image);
             return new TaskResource($task);            
         }
     }

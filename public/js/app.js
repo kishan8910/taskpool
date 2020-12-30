@@ -1943,6 +1943,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     editingtask: {
@@ -1956,21 +1966,43 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         id: '',
         title: '',
         content: '',
-        views: '' // assignees : []
+        views: '',
+        image: '' // assignees : []
 
       },
       task_id: '',
-      edit: false
+      edit: false,
+      image: ''
     };
   },
   watch: {
     editingtask: function editingtask(newtask) {
       this.task = _objectSpread({}, newtask);
+      this.image = newtask.image;
     }
   },
   methods: {
-    createTask: function createTask() {
+    removeImage: function removeImage() {
+      this.image = '';
+    },
+    onFileChange: function onFileChange(e) {
+      var files = e.target.files || e.dataTransfer.files;
+      this.createImage(files[0]);
+    },
+    createImage: function createImage(file) {
       var _this = this;
+
+      var image = new Image();
+      var reader = new FileReader();
+
+      reader.onload = function (e) {
+        _this.image = e.target.result;
+      };
+
+      reader.readAsDataURL(file);
+    },
+    createTask: function createTask() {
+      var _this2 = this;
 
       if (this.task && this.task.id) {
         axios({
@@ -1980,31 +2012,39 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             task_id: this.task.id,
             title: this.task.title,
             content: this.task.content,
-            created_by: this.$userId
+            created_by: this.$userId,
+            image: this.image
           }
         }).then(function (res) {
           // check if the request is successful
-          _this.$emit("task-edited", _this.task);
+          removeImage();
 
-          _this.task.id = null;
+          _this2.$emit("task-edited", _this2.task);
+
+          _this2.task.id = null;
         })["catch"](function (error) {
           console.log(error);
         });
       } else {
+        var data = new FormData();
+        data.append('image', document.getElementById('image').files[0]);
+        data.append('task_id', this.task.id);
+        data.append('title', this.task.title);
+        data.append('content', this.task.content);
+        data.append('created_by', this.$userId);
         axios({
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          },
           method: 'post',
           url: '/api/tasks',
-          data: {
-            task_id: this.task.id,
-            title: this.task.title,
-            content: this.task.content,
-            created_by: this.$userId
-          }
+          data: data
         }).then(function (res) {
           // check if the request is successful
-          _this.$emit("task-created");
+          _this2.$emit("task-created");
 
-          _this.task = {};
+          _this2.image = '';
+          _this2.task = {};
         })["catch"](function (error) {
           console.log(error);
         });
@@ -44029,6 +44069,7 @@ var render = function() {
           _c(
             "form",
             {
+              attrs: { enctype: "multipart/form-data", method: "post" },
               on: {
                 submit: function($event) {
                   $event.preventDefault()
@@ -44060,10 +44101,8 @@ var render = function() {
                       _vm.$set(_vm.task, "title", $event.target.value)
                     }
                   }
-                })
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "form-group" }, [
+                }),
+                _vm._v(" "),
                 _c("label", { attrs: { for: "content" } }, [_vm._v("Content")]),
                 _vm._v(" "),
                 _c("textarea", {
@@ -44086,14 +44125,69 @@ var render = function() {
                       _vm.$set(_vm.task, "content", $event.target.value)
                     }
                   }
-                })
-              ]),
-              _vm._v(" "),
-              _c(
-                "button",
-                { staticClass: "btn btn-primary", attrs: { type: "submit" } },
-                [_vm._v("Save Task")]
-              )
+                }),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass:
+                      "btn btn-sm btn-primary\n              pull-right",
+                    staticStyle: {
+                      margin: "10px",
+                      padding: "5 15 5 15",
+                      "background-color": "#4267b2"
+                    },
+                    attrs: { type: "submit" }
+                  },
+                  [_vm._v("Save Task")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "div",
+                  {
+                    staticStyle: {
+                      position: "relative",
+                      display: "inline-block"
+                    }
+                  },
+                  [
+                    _c(
+                      "div",
+                      {
+                        staticStyle: {
+                          border: "1px solid #ddd",
+                          "background-color": "#efefef",
+                          padding: "5 17 5 12",
+                          "margin-bottom": "10px"
+                        }
+                      },
+                      [
+                        _c("input", {
+                          staticStyle: {
+                            position: "absolute",
+                            left: "0",
+                            top: "0",
+                            opacity: "0"
+                          },
+                          attrs: { type: "file", id: "image", name: "image" },
+                          on: { change: _vm.onFileChange }
+                        }),
+                        _vm._v(" "),
+                        _c("b", [_vm._v("Choose File")])
+                      ]
+                    )
+                  ]
+                ),
+                _vm._v(" "),
+                _vm.image
+                  ? _c("div", [
+                      _c("img", {
+                        staticStyle: { width: "200px" },
+                        attrs: { src: _vm.image }
+                      })
+                    ])
+                  : _vm._e()
+              ])
             ]
           )
         ])
