@@ -13,7 +13,10 @@
             <div class="card-body" >
                 <h4 class="card-title">{{ task.title }} </h4>
                 <p class="card-subtitle mb-2 text-muted">Posted by: {{task.user.name}}</p>
-                <p class="card-text">{{ task.content }}</p>
+                <p class="card-text">
+                    <img :src=getImgUrl(task.image) width="200"/><br>
+                    {{ task.content }}
+                </p>
                 <a @click="showCommentsMethod(task)" class="card-link">Comments ({{ task.comments.length }})</a>
                 <a href="#" @click="deleteTask(task.id)" class="card-link">Assign myself</a>
                 <a href="#" @click="deleteTask(task.id)" class="card-link">Assignees</a>
@@ -98,9 +101,27 @@
 
         created() {
             Vue.use(VueToast);
+            Echo.private('comment-channel')
+                    .listen('CommentEvent', (e) => {
+                    let instance = Vue.$toast;
+                    instance.success('Comment has been added to the task <strong>'+e.task.title+'</strong> ', {
+                        position: 'top-right'
+                    });
+                    instance.dismiss();
+                });
+
         },
 
         methods: {
+
+            getImgUrl(image) {
+                if(image) {
+                   return 'img/'+image;
+                }
+                else {
+                    return '';
+                }
+            },
             showCommentsMethod(task) {
                 this.showComments = task.id;
             },
@@ -153,14 +174,7 @@
                         console.log(error)
                     });
                 }
-                Echo.private('comment-channel')
-                    .listen('CommentEvent', (e) => {
-                    let instance = Vue.$toast;
-                    instance.success('Comment has been added to the task <strong>'+e.task.title+'</strong> ', {
-                        position: 'top-right'
-                    });
-                    instance.dismiss();
-                });
+                
             },
             editTask(task) {
                 this.$emit('event1',task);

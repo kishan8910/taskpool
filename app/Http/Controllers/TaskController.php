@@ -6,12 +6,25 @@ use Illuminate\Http\Request;
 // use App\Http\Requests;
 use App\Task;
 use App\Http\Resources\Task as TaskResource;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
 {
 
-
+    /**
+     * Get a validator for an incoming task request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    protected function validator(array $data)
+    {
+        return Validator::make($data, [
+            'title' => ['required', 'string', 'max:100', 'unique:tasks'],
+            'content' => ['required', 'string']
+        ]);
+    }
 
 
     /**

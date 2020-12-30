@@ -2005,16 +2005,16 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var _this2 = this;
 
       if (this.task && this.task.id) {
+        var data = new FormData();
+        data.append('image', document.getElementById('image').files[0]);
+        data.append('task_id', this.task.id);
+        data.append('title', this.task.title);
+        data.append('content', this.task.content);
+        data.append('created_by', this.$userId);
         axios({
           method: 'put',
           url: '/api/tasks',
-          data: {
-            task_id: this.task.id,
-            title: this.task.title,
-            content: this.task.content,
-            created_by: this.$userId,
-            image: this.image
-          }
+          data: data
         }).then(function (res) {
           // check if the request is successful
           removeImage();
@@ -2026,19 +2026,25 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           console.log(error);
         });
       } else {
-        var data = new FormData();
-        data.append('image', document.getElementById('image').files[0]);
-        data.append('task_id', this.task.id);
-        data.append('title', this.task.title);
-        data.append('content', this.task.content);
-        data.append('created_by', this.$userId);
+        var _data = new FormData();
+
+        _data.append('image', document.getElementById('image').files[0]);
+
+        _data.append('task_id', this.task.id);
+
+        _data.append('title', this.task.title);
+
+        _data.append('content', this.task.content);
+
+        _data.append('created_by', this.$userId);
+
         axios({
           headers: {
             'Content-Type': 'multipart/form-data'
           },
           method: 'post',
           url: '/api/tasks',
-          data: data
+          data: _data
         }).then(function (res) {
           // check if the request is successful
           _this2.$emit("task-created");
@@ -2215,6 +2221,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: {
     loading: {
@@ -2260,8 +2269,22 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   // },
   created: function created() {
     Vue.use(VueToast);
+    Echo["private"]('comment-channel').listen('CommentEvent', function (e) {
+      var instance = Vue.$toast;
+      instance.success('Comment has been added to the task <strong>' + e.task.title + '</strong> ', {
+        position: 'top-right'
+      });
+      instance.dismiss();
+    });
   },
   methods: {
+    getImgUrl: function getImgUrl(image) {
+      if (image) {
+        return 'img/' + image;
+      } else {
+        return '';
+      }
+    },
     showCommentsMethod: function showCommentsMethod(task) {
       this.showComments = task.id;
     },
@@ -2309,14 +2332,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           console.log(error);
         });
       }
-
-      Echo["private"]('comment-channel').listen('CommentEvent', function (e) {
-        var instance = Vue.$toast;
-        instance.success('Comment has been added to the task <strong>' + e.task.title + '</strong> ', {
-          position: 'top-right'
-        });
-        instance.dismiss();
-      });
     },
     editTask: function editTask(task) {
       this.$emit('event1', task);
@@ -44400,7 +44415,13 @@ var render = function() {
             ]),
             _vm._v(" "),
             _c("p", { staticClass: "card-text" }, [
-              _vm._v(_vm._s(task.content))
+              _c("img", {
+                attrs: { src: _vm.getImgUrl(task.image), width: "200" }
+              }),
+              _c("br"),
+              _vm._v(
+                "\n                " + _vm._s(task.content) + "\n            "
+              )
             ]),
             _vm._v(" "),
             _c(

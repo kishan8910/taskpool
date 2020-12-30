@@ -86,16 +86,17 @@
             createTask() {
                 
                 if (this.task && this.task.id) {
+                    let data = new FormData;
+                    data.append('image', document.getElementById('image').files[0]);
+                    data.append('task_id', this.task.id);
+                    data.append('title', this.task.title);
+                    data.append('content', this.task.content);
+                    data.append('created_by', this.$userId);
+
                     axios({
                         method: 'put',
                         url: '/api/tasks',
-                        data: {
-                            task_id : this.task.id,
-                            title : this.task.title,
-                            content : this.task.content,
-                            created_by : this.$userId,
-                            image : this.image
-                        }
+                        data: data
                     })
                     .then(res => {
                         // check if the request is successful
