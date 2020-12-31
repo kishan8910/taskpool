@@ -19,6 +19,7 @@ class CreateTaskUserTable extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade')->onUpdate('cascade');
             $table->string('status')->default('INPROGRESS');
             $table->timestamps();
+            $table->unique(["task_id", "user_id"], 'task_user_unique');
         });
     }
 

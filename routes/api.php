@@ -42,3 +42,6 @@ Route::delete('/comments/{id}', 'CommentController@destroy');
 
 // update a comment
 Route::put('/comments', 'CommentController@store');
+
+// assign a user
+Route::post('/assignees', 'TaskController@assign');

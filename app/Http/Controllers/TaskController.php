@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 // use App\Http\Requests;
 use App\Task;
+use App\User;
 use App\Http\Resources\Task as TaskResource;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
@@ -116,5 +117,23 @@ class TaskController extends Controller
             Storage::delete($task->image);
             return new TaskResource($task);            
         }
+    }
+
+
+    /**
+     * add assignee to a task
+     *
+     * @param  int  $task id, $user id
+     * @return \Illuminate\Http\Response
+     */
+    public function assign(Request $request)
+    {
+
+        $task_id = $request->input('task_id');
+        $user_id = $request->input('user_id');
+
+        $user = User::find($user_id);
+        $user->tasks()->attach($task_id);
+        
     }
 }

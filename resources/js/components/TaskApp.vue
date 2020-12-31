@@ -1,7 +1,7 @@
 <template>
     <div>
         <createedittask :editingtask="editingtask" v-on:task-edited="editTask" v-on:task-created="createTask" />
-        <tasks :tasks="tasks" :pagination="pagination" :loading="loading" v-on:event1="abc" v-on:paginationEvent="makePagination" v-on:fetchPageEvent="fetchTasks" v-on:comment-created="createComment" v-on:task-deleted="deleteTask" v-on:comment-deleted="deleteComment" />
+        <tasks :tasks="tasks" :pagination="pagination" :loading="loading" v-on:event1="abc" v-on:paginationEvent="makePagination" v-on:fetchPageEvent="fetchTasks" v-on:comment-created="createComment" v-on:task-deleted="deleteTask" v-on:comment-deleted="deleteComment" v-on:assignee-added="fetchTasks" />
     
     </div>
 </template>

@@ -18,11 +18,12 @@
                     {{ task.content }}
                 </p>
                 <a style="cursor: pointer;" @click="showCommentsMethod(task)" class="card-link">Comments ({{ task.comments.length }})</a>
-                <a style="cursor: pointer;" @click="deleteTask(task.id)" class="card-link">Assign me</a>
+                <a style="cursor: pointer;" @click="assignUser(task)" class="card-link">Assign me</a>
                 
-                <a style="cursor: pointer;" v-b-modal.modal-1 class="card-link">Assignees ({{ task.assignees.length }})</a>
-                <b-modal id="modal-1" title="BootstrapVue">
-                    <p class="my-4">Hello from modal!</p>
+                <a style="cursor: pointer;" @click="showAssignees(task)" class="card-link">Assignees ({{ task.assignees.length }})</a>
+                <b-modal ok-only ok-variant="primary" ok-title="Ok" v-bind:id="'assignees'+task.id" v-bind:title="'Assignees for '+task.title">
+                    <li v-for="assignee in task.assignees" class="my-4">{{ assignee.name }}</li>
+                    <span v-if="task.assignees.length == 0">No assignees</span>
                 </b-modal>
 
 
@@ -99,12 +100,6 @@
                 url : '',
             }
         },
-        
-        // watch: {
-        //     comment: function () {
-        //         this.task_id = this.task.id
-        //     }
-        // },
 
         created() {
 
@@ -117,16 +112,6 @@
                     });
 
                     this.$emit("comment-created");
-                    // const index = this.tasks.findIndex(t => t.id === e.task.id);
-                    // // this.tasks.findIndex(function(t){
-                    // //     return t.id === task.id
-                    // // })
-                    // if(index !== -1){
-                    //     this.tasks[index].title = task.title;
-                    //     this.tasks[index].content = task.content;
-                    // }
-
-                    // this.task
                     instance.dismiss();
                 });
 
@@ -134,8 +119,30 @@
 
         methods: {
 
+            assignUser(taskObj) {
+                axios({
+                    method: 'post',
+                    url: '/api/assignees',
+                    data: {
+                        user_id : this.$userId,
+                        task_id : taskObj.id
+                    }
+                })
+                .then(res => {
+                    this.$emit("assignee-added");
+                    let instance = Vue.$toast;
+                    instance.success('You added to task <strong>'+taskObj.title+'</strong> ', {
+                        position: 'top-right'
+                    });
+                    instance.dismiss();
+                })
+                .catch(error =>{
+                    
+                });
+            },
+
             showAssignees(taskObj) {
-                console.log(taskObj.assignees);
+                this.$bvModal.show('assignees'+taskObj.id);
             },
 
             authorizeUser(id) {
