@@ -1,8 +1,15 @@
 <template>
-    <div>
-        <createedittask :editingtask="editingtask" v-on:task-edited="editTask" v-on:task-created="createTask" />
-        <tasks :tasks="tasks" :pagination="pagination" :loading="loading" v-on:event1="abc" v-on:paginationEvent="makePagination" v-on:fetchPageEvent="fetchTasks" v-on:comment-created="createComment" v-on:task-deleted="deleteTask" v-on:comment-deleted="deleteComment" v-on:assignee-added="fetchTasks" />
-    
+    <div class="row justify-content-center">
+        <div class="col-md-3 wrapper">
+            <sidemenu v-on:filterParam="filterTasks" />
+        </div>
+        <div class="col-md-9">
+            <div>
+                <createedittask :editingtask="editingtask" v-on:task-edited="editTask" v-on:task-created="createTask" />
+                <tasks :tasks="tasks" :pagination="pagination" :loading="loading" v-on:editEvent="edit" v-on:paginationEvent="makePagination" v-on:fetchPageEvent="fetchTasks" v-on:comment-created="createComment" v-on:task-deleted="deleteTask" v-on:comment-deleted="deleteComment" v-on:assignee-added="fetchTasks" />
+            
+            </div>
+        </div>
     </div>
 </template>
 <script>
@@ -16,15 +23,17 @@ export default {
                 tasks : [],
                 editingtask : null,
                 pagination : {},
-                
             }
         },
         created() {
- 
             this.fetchTasks();
         },
 
         methods: {
+            filterTasks(filterParam) {
+                console.log(this.tasks);
+                console.log(filterParam);
+            },
             deleteTask() {
                 this.fetchTasks();
             },
@@ -39,19 +48,17 @@ export default {
             },
             editTask(task) {
                
-                const index = this.tasks.findIndex(t => t.id === task.id);
-                // this.tasks.findIndex(function(t){
-                //     return t.id === task.id
-                // })
-                if(index !== -1){
-                    this.tasks[index].title = task.title;
-                    this.tasks[index].content = task.content;
-                }
+                // const index = this.tasks.findIndex(t => t.id === task.id);
+                
+                // if(index !== -1){
+                //     this.tasks[index].title = task.title;
+                //     this.tasks[index].content = task.content;
+                // }
 
                 this.fetchTasks();
             },
 
-            abc(task) {
+            edit(task) {
                 this.editingtask = task;
             },
 

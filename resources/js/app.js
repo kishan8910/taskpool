@@ -35,9 +35,13 @@ if(document.querySelector("meta[name='user-id']"))
 
 
 Vue.component('task-app', require('./components/TaskApp.vue').default);
+Vue.component('sidemenu', require('./components/SideMenu.vue').default);
 Vue.component('tasks', require('./components/Tasks.vue').default);
+Vue.component('roles', require('./components/Roles.vue').default);
 Vue.component('navbar', require('./components/Navbar.vue').default);
 Vue.component('createedittask', require('./components/CreateEditTask.vue').default);
+Vue.component('createeditrole', require('./components/CreateRoles.vue').default);
+
 
 
 /**

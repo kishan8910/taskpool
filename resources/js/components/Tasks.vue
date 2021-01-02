@@ -1,15 +1,7 @@
 <template>
     <div>
-        <h2>Tasks</h2>
-        <nav aria-label="Page navigation example">
-            <ul class="pagination">
-                <li v-bind:class="[{disabled: !pagination.prev_page_url}]" class="page-item"><a class="page-link" @click="fetchPage(pagination.prev_page_url)" href="#">Previous</a></li>
-                <li class="page-item text-dark"><a class="page-link disabled"  href="#">Page {{ pagination.current_page}} / {{pagination.last_page }}</a></li>
-                <li v-bind:class="[{disabled: !pagination.next_page_url}]" class="page-item"><a class="page-link" @click="fetchPage(pagination.next_page_url)" href="#">Next</a></li>
-            </ul>
-        </nav>
         <div v-if="loading">loading ...</div>
-        <div class="card mb-2"  v-for="task,key in tasks" v-bind:key="task.id">
+        <div class="card mb-1"  v-for="task,key in tasks" v-bind:key="task.id">
             <div class="card-body" >
                 <h4 class="card-title">{{ task.title }} </h4>
                 <p class="card-subtitle mb-2 text-muted">Posted by: {{task.user.name}}</p>
@@ -27,7 +19,7 @@
                 </b-modal>
 
 
-                <a v-if="authorizeUser(task.user.id)" style="cursor: pointer;" @click="editTask(task)" class="card-link">Edit</a>
+                <a  href="#addTask"  v-if="authorizeUser(task.user.id)" style="cursor: pointer;" @click="editTask(task)" class="card-link">Edit</a>
                 <a v-if="authorizeUser(task.user.id)" style="cursor: pointer;" @click="deleteTask(task.id)" class="card-link">Delete</a>
             </div>
             
@@ -63,6 +55,13 @@
                 </div>
             </div>
         </div>
+        <nav aria-label="Page navigation example" class="mt-2">
+            <ul class="pagination">
+                <li v-bind:class="[{disabled: !pagination.prev_page_url}]" class="page-item"><a class="page-link" @click="fetchPage(pagination.prev_page_url)" href="#">Previous</a></li>
+                <li class="page-item text-dark"><a class="page-link disabled"  href="#">Page {{ pagination.current_page}} / {{pagination.last_page }}</a></li>
+                <li v-bind:class="[{disabled: !pagination.next_page_url}]" class="page-item"><a class="page-link" @click="fetchPage(pagination.next_page_url)" href="#">Next</a></li>
+            </ul>
+        </nav>
     </div>
 </template>
 
@@ -218,7 +217,7 @@
                 
             },
             editTask(task) {
-                this.$emit('event1',task);
+                this.$emit('editEvent',task);
             },
 
             fetchPage(url) {

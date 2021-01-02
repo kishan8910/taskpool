@@ -1,21 +1,22 @@
 <template>
      <div class="row">
-            <div class="col-10 mx-auto">
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Create Task</h2>
-                    </div>
+            <div class="col-12">
+                <!-- <a v-if="!showForm" @click="showForm = true;initialize();" href="#addTask" class="btn btn-primary mb-2">+ Add Task</a>
+                -->
+                <div  id="addTask" class="card">
+                    
                     <div class="card-body">
-                       <form v-on:submit.prevent="createTask" enctype="multipart/form-data" method="post">
+                        <!-- <button @click="showForm=false;this.task.id=null" class="close" aria-label="Close"> <span aria-hidden="true">&times;</span></button> -->
+                       <form v-on:submit.prevent="createTask()" enctype="multipart/form-data" method="post">
                             <div class="form-group">
                                 <label for="title">Title</label>
-                                <input  type="text" class="form-control" name="title" id="title" v-model="task.title" /> 
+                                <input  type="text" placeholder="title here..." class="form-control" name="title" id="title" v-model="task.title" /> 
                                 <span class="text-danger" role="alert">
                                     <strong>{{ errors.get('title') }}</strong>
                                 </span>
                                 <br>
                                 <label for="content">Content</label>
-                                <textarea v-model="task.content" class="form-control" id="content" name="content" rows="4" ></textarea>
+                                <textarea placeholder="describe the task here..." v-model="task.content" class="form-control" id="content" name="content" rows="2" ></textarea>
                                 <span class="text-danger" role="alert">
                                     <strong>{{ errors.get('content') }}</strong>
                                 </span>
@@ -30,10 +31,8 @@
                                            
                                     </div>
                                 </div>
-                                    <!-- <button @click="removeImage" v-if="image" class="btn btn-sm ml-2 btn-outline-danger">Remove Image</button>  -->
                                 
-                                <div v-if="image" > <img :src="image" style="width:200px" /></div> 
-                                                  
+                                <div v-if="image" > <img :src="image" style="width:200px" /></div>             
                             </div>
                         </form>
                     </div>
@@ -75,22 +74,23 @@
                     id : '',
                     title : '',
                     content : '',
-                    views : '',
                     image : '',
                     // assignees : []
                 },
                 task_id : '',
                 edit : false,
-                image : ''
+                image : '',
+                showForm : false
             }
         },
         watch: {
             editingtask: function (newtask) {
                 this.task = {...newtask};
-                // this.image = newtask.image;
+                // this.showForm = true;
             }
         },
-        methods: {   
+        methods: {  
+            
             removeImage() {
                 this.image = '';
             },
@@ -107,10 +107,9 @@
                 reader.readAsDataURL(file);
             },
             createTask() {
-                var self = this;
+ 
                 if (this.task && this.task.id) {
-                    
-
+                   console.log(this.task);
                     axios({
                         method: 'put',
                         url: '/api/tasks',
@@ -123,23 +122,32 @@
                     })
                     .then(res => {
                         this.errors = new Errors();
+                        console.log(this.task);                        
+                        this.task.content = '';
                         this.$emit("task-edited", this.task);
-                        this.task.id = null;
+                        // initialize();
+                        // let instance = Vue.$toast;
+                        // instance.success('Task <strong>'+this.task.title+'</strong> Updated!', {
+                        //     position: 'top-right'
+                        // });
+                        // instance.dismiss();
                         
                     })
                     .catch(error => {
+                       
                         this.errors.record(error.response.data);
                     });
                 }
                 else {
-
-                    let data = new FormData;
+                    
+                    let data = new FormData()
+                    console.log(this.task)
                     data.append('image', document.getElementById('image').files[0]);
-                    data.append('task_id', this.task.id);
-                    data.append('title', this.task.title);
+                    // data.append('task_id', this.task.id);
+                    data.append('title', this.task.title );
                     data.append('content', this.task.content);
                     data.append('created_by', this.$userId);
-
+                    
                     axios({
                         headers: { 'Content-Type': 'multipart/form-data' },
                         method: 'post',

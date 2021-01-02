@@ -56,7 +56,7 @@ class TaskController extends Controller
         $task->id = $request->input('task_id');
         $task->title = $request->input('title');
         $task->content = $request->input('content');
-        $task->views = $request->input('views');
+        
         $task->created_by = $request->input('created_by');
         
         if($request->hasFile('image')) {
