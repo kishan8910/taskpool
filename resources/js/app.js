@@ -7,6 +7,11 @@
 require('./bootstrap');
 
 window.Vue = require('vue');
+import VueRouter from 'vue-router';
+
+Vue.use(VueRouter);
+
+
 
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 // Install BootstrapVue
@@ -18,6 +23,11 @@ Vue.use(IconsPlugin)
 if(document.querySelector("meta[name='user-id']"))
 {
     Vue.prototype.$userId = document.querySelector("meta[name='user-id']").getAttribute('content');
+}
+
+if(document.querySelector("meta[name='user-role']"))
+{
+    Vue.prototype.$userRole = document.querySelector("meta[name='user-role']").getAttribute('content');
 }
 
 
@@ -43,6 +53,21 @@ Vue.component('createedittask', require('./components/CreateEditTask.vue').defau
 Vue.component('createeditrole', require('./components/CreateRoles.vue').default);
 
 
+import Roles from './components/Roles.vue';
+
+const routes= [
+
+    { path: '/roles', component: Roles}
+
+];
+
+const router = new VueRouter({
+    routes,
+    mode: 'history'
+});
+
+
+
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to
@@ -50,6 +75,9 @@ Vue.component('createeditrole', require('./components/CreateRoles.vue').default)
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
+
 const app = new Vue({
     el: '#app',
+    router
 });
+

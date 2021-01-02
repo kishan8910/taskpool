@@ -5,6 +5,7 @@
         </div>
         <div class="col-md-9">
             <div>
+                
                 <createedittask :editingtask="editingtask" v-on:task-edited="editTask" v-on:task-created="createTask" />
                 <tasks :tasks="tasks" :pagination="pagination" :loading="loading" v-on:editEvent="edit" v-on:paginationEvent="makePagination" v-on:fetchPageEvent="fetchTasks" v-on:comment-created="createComment" v-on:task-deleted="deleteTask" v-on:comment-deleted="deleteComment" v-on:assignee-added="fetchTasks" />
             

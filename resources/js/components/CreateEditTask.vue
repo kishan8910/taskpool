@@ -1,12 +1,12 @@
 <template>
      <div class="row">
             <div class="col-12">
-                <!-- <a v-if="!showForm" @click="showForm = true;initialize();" href="#addTask" class="btn btn-primary mb-2">+ Add Task</a>
-                -->
-                <div  id="addTask" class="card">
+                <a v-if="!showForm" @click="showForm = true;" href="#addTask" class="btn btn-primary mb-2">+ Add Task</a>
+               
+                <div v-if="showForm" id="addTask" class="card">
                     
                     <div class="card-body">
-                        <!-- <button @click="showForm=false;this.task.id=null" class="close" aria-label="Close"> <span aria-hidden="true">&times;</span></button> -->
+                        <button @click="showForm=false;" class="close" aria-label="Close"> <span aria-hidden="true">&times;</span></button>
                        <form v-on:submit.prevent="createTask()" enctype="multipart/form-data" method="post">
                             <div class="form-group">
                                 <label for="title">Title</label>
@@ -86,7 +86,7 @@
         watch: {
             editingtask: function (newtask) {
                 this.task = {...newtask};
-                // this.showForm = true;
+                this.showForm = true;
             }
         },
         methods: {  
@@ -109,7 +109,7 @@
             createTask() {
  
                 if (this.task && this.task.id) {
-                   console.log(this.task);
+                   
                     axios({
                         method: 'put',
                         url: '/api/tasks',
@@ -121,16 +121,18 @@
                         }
                     })
                     .then(res => {
+                        
                         this.errors = new Errors();
-                        console.log(this.task);                        
+                        
                         this.task.content = '';
                         this.$emit("task-edited", this.task);
+                        
                         // initialize();
-                        // let instance = Vue.$toast;
-                        // instance.success('Task <strong>'+this.task.title+'</strong> Updated!', {
-                        //     position: 'top-right'
-                        // });
-                        // instance.dismiss();
+                        let instance = Vue.$toast;
+                        instance.success('Task <strong>'+this.task.title+'</strong> Updated!', {
+                            position: 'top-right'
+                        });
+                        instance.dismiss();
                         
                     })
                     .catch(error => {
@@ -141,7 +143,7 @@
                 else {
                     
                     let data = new FormData()
-                    console.log(this.task)
+        
                     data.append('image', document.getElementById('image').files[0]);
                     // data.append('task_id', this.task.id);
                     data.append('title', this.task.title );
@@ -159,6 +161,12 @@
                         this.$emit("task-created");
                         this.image = '';
                         this.task = {};
+
+                        let instance = Vue.$toast;
+                        instance.success('Task Created!', {
+                            position: 'top-right'
+                        });
+                        instance.dismiss();
                     })
                    .catch(error => {
                         this.errors.record(error.response.data);

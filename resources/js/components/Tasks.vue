@@ -19,8 +19,9 @@
                 </b-modal>
 
 
-                <a  href="#addTask"  v-if="authorizeUser(task.user.id)" style="cursor: pointer;" @click="editTask(task)" class="card-link">Edit</a>
-                <a v-if="authorizeUser(task.user.id)" style="cursor: pointer;" @click="deleteTask(task.id)" class="card-link">Delete</a>
+                <a    v-if="authorizeUser(task)" style="cursor: pointer;" @click="editTask(task)" class="card-link">Edit</a>
+                <a v-if="authorizeUser(task)" style="cursor: pointer;" @click="deleteTask(task.id)" class="card-link">Delete</a>
+
             </div>
             
             <div class="" v-if="showComments === task.id" id="prev_comment">
@@ -101,7 +102,6 @@
         },
 
         created() {
-
             Vue.use(VueToast);
             Echo.private('comment-channel')
                     .listen('CommentEvent', (e) => {
@@ -144,9 +144,9 @@
                 this.$bvModal.show('assignees'+taskObj.id);
             },
 
-            authorizeUser(id) {
+            authorizeUser(taskObj) {
                 
-                if(id == this.$userId) {
+                if(taskObj.user.id == this.$userId || this.$userRole == 1) {
                     return true;
                 }
                 else {
