@@ -19,8 +19,8 @@
                 </b-modal>
 
 
-                <a    v-if="authorizeUser(task)" style="cursor: pointer;" @click="editTask(task)" class="card-link">Edit</a>
-                <a v-if="authorizeUser(task)" style="cursor: pointer;" @click="deleteTask(task.id)" class="card-link">Delete</a>
+                <a    v-if="authorizeUser(task.user.id)" style="cursor: pointer;" @click="editTask(task)" class="card-link">Edit</a>
+                <a v-if="authorizeUser(task.user.id)" style="cursor: pointer;" @click="deleteTask(task.id)" class="card-link">Delete</a>
 
             </div>
             
@@ -144,9 +144,9 @@
                 this.$bvModal.show('assignees'+taskObj.id);
             },
 
-            authorizeUser(taskObj) {
+            authorizeUser(userId) {
                 
-                if(taskObj.user.id == this.$userId || this.$userRole == 1) {
+                if(userId == this.$userId || this.$userRole == 1) {
                     return true;
                 }
                 else {
@@ -184,10 +184,11 @@
                         }
                     })
                     .then(res => {
+                        this.showComments = task_id;
+                        this.commentEditFormVisible = null;
                         // check if the request is successful
                         this.$emit("comment-edited", this.comment);
                         this.comment.id = null;
-
                     })
 
                     .catch(error =>{

@@ -49,7 +49,7 @@ class TaskController extends Controller
     public function store(Request $request)
     {
         $this->validate($request,[
-            'title' => ['required', 'string', 'max:100'],
+            'title' => ['required', 'string', 'max:30'],
             'content' => ['required', 'string']
         ]);
         $task = $request->isMethod('put') ? Task::findOrFail($request->task_id) : New Task;
